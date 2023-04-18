@@ -1,3 +1,24 @@
+:root {
+    --blue-500: #1a237e;
+    
+    --purple-500: #4527a0;
+    
+    --pink-500: #d500f9;
+    
+    --gray-100: #fafafa;
+    --gray-300: #aaaaaa;
+    --gray-700: #3a444d;
+    --gray-800: #444444;
+    --gray-900: #333333;
+    --gray-000: #222222;
+
+    --shadow-dark: #888888;
+    --shadow-light: #333333;
+
+    --black: #000000;
+    --white: #ffffff;
+}
+
 *, *::before, *::after {
     margin: 0;
     padding: 0;

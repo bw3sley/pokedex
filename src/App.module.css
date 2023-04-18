@@ -14,16 +14,16 @@
     right: 26%;
 
     font-weight: 600;
-    font-size: clamp(.5rem, 5vw, 1.5rem);
+    font-size: clamp(.5rem, 1.5rem, 1.5rem);
 
-    color: #aaa;
+    color: var(--gray-300);
 
     display: flex;
     gap: .5rem;
 }
 
 .pokemonName {
-    color: #3a444d;
+    color: var(--gray-700);
 
     text-transform: capitalize;
 }
@@ -47,15 +47,15 @@
 
     outline: none;
 
-    border: 2px solid #333333;
+    border: 2px solid var(--gray-900);
     border-radius: 5px;
 
     font-weight: 600;
-    font-size: clamp(.5rem, 5vw, 1rem);
+    font-size: clamp(.5rem, 1.5rem, 1rem);
 
-    box-shadow: -3px 4px 0 #888888, -5px 7px 0 #333333;
+    box-shadow: -3px 4px 0 var(--shadow-dark), -5px 7px 0 var(--gray-900);
 
-    color: #3a444d;
+    color: var(--gray-700);
 }
 
 .buttonWrapper {
@@ -76,16 +76,16 @@
 
     padding: .75rem;
     
-    font-size: clamp(.5rem, 5vw, 1rem);
+    font-size: clamp(.5rem, 1.5rem, 1rem);
     font-weight: 600;
     
-    border: 2px solid #000000;
+    border: 2px solid var(--black);
     border-radius: 5px;
     
-    background-color: #444444;
-    color: #ffffff;
+    background-color: var(--gray-800);
+    color: var(--white);
 
-    box-shadow: -2px 3px 0 #222, -4px 6px 0 #000;
+    box-shadow: -2px 3px 0 var(--gray-000), -4px 6px 0 var(--black);
 
     cursor: pointer;
 
@@ -93,11 +93,11 @@
 }
 
 .buttonWrapper button:hover {
-    background-color: #222;
+    background-color: var(--gray-000);
 }
 
 .buttonWrapper button:active {
-    box-shadow: inset -4px 4px 0 #222;
+    box-shadow: inset -4px 4px 0 var(--gray-000);
 
     font-size: 1rem;
 }
