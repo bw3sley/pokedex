@@ -1,35 +1,116 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ChangeEvent, useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+import classNames from "classnames";
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+import bgImage from "./assets/pokedex.png";
+
+import style from "./App.module.css";
+
+import { api } from "./lib/axios";
+
+import "./global.css";
+
+interface Pokemon {
+  id: string | number,
+  name: string,
+  imageUrl: string
 }
 
-export default App
+export function App() {
+  const [pokemonName, setPokemonName] = useState("bulbasaur");
+  const [pokemon, setPokemon] = useState<Pokemon>({
+    id: "1",
+    name: "Bulbasaur",
+    imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif"
+  })
+
+  function handleSearchPokemon(event: ChangeEvent<HTMLInputElement>) {
+    const lowercasedPokemonName = String(event?.target.value).toLocaleLowerCase();
+
+    setPokemonName(lowercasedPokemonName);
+  }
+
+  function handlePreviousPokemon() {
+    const previousPokemon = {
+      id: String(Number(pokemon.id) - 1),
+    }
+
+    setPokemonName(previousPokemon.id);
+  }
+
+  function handleNextPokemon() {
+    const nextPokemon = {
+      id: String(Number(pokemon.id) + 1),
+    }
+
+    setPokemonName(nextPokemon.id);
+  }
+
+  async function fetchPokemon() {
+    const response = await api.get(`pokemon/${pokemonName}`);
+    const data = await response.data;
+
+    const newPokemon = {
+      id: data.id,
+      name: data.name,
+      imageUrl: data['sprites']['versions']['generation-v']['black-white']['animated']['front_default']
+    }
+
+    setPokemon(newPokemon);
+  }
+
+  // I know it's not right
+
+  useEffect(() => {
+    fetchPokemon();
+  }, [pokemonName]);
+
+  return (
+    <main>
+      <img 
+        src={pokemon.imageUrl} 
+        alt=""
+        className={style.pokemonImage}
+      />
+
+      <div className={style.pokemonData}>
+        <strong className={style.pokemonNumber}>{pokemon.id}</strong>
+        <span>-</span>
+        <strong className={style.pokemonName}>{pokemon.name}</strong>
+      </div>
+
+      <form action="" className={style.form}>
+        <input 
+          type="search"
+          id=""
+          className={style.searchInput}
+          placeholder="Name or number"
+
+          onChange={handleSearchPokemon}
+
+          required 
+        />
+      </form>
+
+      <div className={style.buttonWrapper}>
+        <button 
+          type="button" 
+          className={classNames(style.button, style.buttonPrev)}
+          onClick={handlePreviousPokemon}
+        >
+          &lt; Prev
+        </button>
+        
+        <button 
+          type="button" 
+          className={classNames(style.button, style.buttonNext)}
+          onClick={handleNextPokemon}
+        >
+          Next &gt;
+        </button>
+      </div>
+
+      <img src={bgImage} alt="" />
+    </main>
+  )
+}
