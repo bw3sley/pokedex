@@ -1,4 +1,8 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
+
+import { AxiosError } from "axios";
+
+import { debounce } from "lodash";
 
 import classNames from "classnames";
 
@@ -11,59 +15,77 @@ import { api } from "./lib/axios";
 import "./global.css";
 
 interface Pokemon {
-  id: string | number,
+  id: string,
   name: string,
   imageUrl: string
 }
 
 export function App() {
-  const [pokemonName, setPokemonName] = useState("bulbasaur");
-  const [pokemon, setPokemon] = useState<Pokemon>({
+  const [pokemonName, setPokemonName] = useState("");
+  const [pokemon, setPokemon] = useState({
     id: "1",
     name: "Bulbasaur",
     imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif"
   })
 
-  function handleSearchPokemon(event: ChangeEvent<HTMLInputElement>) {
-    const lowercasedPokemonName = String(event?.target.value).toLocaleLowerCase();
+  const handleDebouncedSearch = debounce((searchValue: string) => {
+    fetchPokemon(searchValue);
+  }, 300)
 
-    setPokemonName(lowercasedPokemonName);
+  async function handleSearchPokemon(event: ChangeEvent<HTMLInputElement>) {
+    const lowercasedPokemonName = event?.target.value?.toLowerCase();
+
+    setPokemonName(lowercasedPokemonName || "");
+
+    if(lowercasedPokemonName) {
+      await handleDebouncedSearch(lowercasedPokemonName);
+    }
   }
 
-  function handlePreviousPokemon() {
-    const previousPokemon = {
-      id: String(Number(pokemon.id) - 1),
+  async function handlePreviousPokemon() {
+    const previousPokemonId = Number(pokemon.id) - 1;
+
+    setPokemonName(String(previousPokemonId));
+
+    await handleDebouncedSearch(pokemonName);
+  }
+
+  async function handleNextPokemon() {
+    const nextPokemonId = Number(pokemon.id) + 1;
+
+    setPokemonName(String(nextPokemonId));
+
+    await handleDebouncedSearch(pokemonName);
+  }
+
+  async function fetchPokemon(pokemonName: string) {
+    try {
+      const response = await api.get(`pokemon/${pokemonName}`);
+      const data = response.data;
+
+      const newPokemon: Pokemon = {
+        id: data.id,
+        name: data.name,
+        imageUrl: data["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"],
+      }
+
+      setPokemon(newPokemon);
     }
 
-    setPokemonName(previousPokemon.id);
-  }
+    catch (error) {
+      console.error("Failed to fetch Pokemon: ", error);
+      
+      const errorResponse = error as AxiosError;
 
-  function handleNextPokemon() {
-    const nextPokemon = {
-      id: String(Number(pokemon.id) + 1),
+      if(errorResponse.response && errorResponse.response.status === 404) {
+        console.log("404 - Not found")
+      }
     }
-
-    setPokemonName(nextPokemon.id);
   }
 
-  async function fetchPokemon() {
-    const response = await api.get(`pokemon/${pokemonName}`);
-    const data = await response.data;
-
-    const newPokemon = {
-      id: data.id,
-      name: data.name,
-      imageUrl: data['sprites']['versions']['generation-v']['black-white']['animated']['front_default']
-    }
-
-    setPokemon(newPokemon);
+  function preventFormSubmission(event: FormEvent) {
+    event.preventDefault();
   }
-
-  // I know it's not right
-
-  useEffect(() => {
-    fetchPokemon();
-  }, [pokemonName]);
 
   return (
     <main>
@@ -79,12 +101,12 @@ export function App() {
         <strong className={style.pokemonName}>{pokemon.name}</strong>
       </div>
 
-      <form action="" className={style.form}>
+      <form action="" className={style.form} onSubmit={preventFormSubmission}>
         <input 
           type="search"
           id=""
           className={style.searchInput}
-          placeholder="Name or number"
+          placeholder="Pokemon name"
 
           onChange={handleSearchPokemon}
 
