@@ -5,6 +5,7 @@
 </a>
 
 </br>
+</br>
 
 ![Preview Screen](./public/pokedex-cover.png)
 
